@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if shows and shows | length > 0 %}
+    {% for show in shows %}
+      <div>
+        <h3>
+          <a href="{{ url_for('show_show', show_id=show.id) }}">{{ show.name }}</a>
+          {% if current_user.is_admin() %}
+            <a class="edit-link" href="{{ url_for('show_edit', show_id=show.id) }}">[edit]</a>
+          {% endif %}
+        </h3>
+        <p>Duration: {{ show.duration }}<br/>
+        Broadcasted on {{ show.timetable | length }} channels</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h3 class="text-center">Nothing to show</h3>
+  {% endif %}
+{% endblock %}

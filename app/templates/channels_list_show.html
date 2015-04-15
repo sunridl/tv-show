@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div>
+    {% if channels_list %}
+        <h2>
+          {{ channels_list.name }}
+          {% if current_user.is_admin() %}
+            <a class="edit-link" href="{{ url_for('channels_list_edit', channels_list_id=channels_list.id) }}">[edit]</a>
+          {% endif %}
+        </h2>
+        <hr/>
+        {% if channels_list.channels and channels_list.channels | length > 0 %}
+          <ul class="list-group">
+            {% for item in channels_list.channels %}
+              <li><a href="{{ url_for('channel_show', channel_id=item.channel.id) }}">{{ item.channel.name }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <h3 class="text-center">Channel list has no channels</h3>
+        {% endif %}
+    {% else %}
+      <h3 class="text-center">No such channels' lists</h3>
+    {% endif %}
+  </div>
+{% endblock %}

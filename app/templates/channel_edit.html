@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>TV-channel editor</h1>
+<br>
+<form method="post" name="register" action="">
+  {{ form.csrf_token }}
+  <p>
+    {{ form.name(placeholder="TV-Channel name") }}
+    <span class="error">
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <button type="submit">Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>TV-show editor</h1>
+<br>
+<form method="post" name="register" action="">
+  {{ form.csrf_token }}
+  <p>
+    {{ form.name(placeholder="TV-Show name") }}
+    <span class="error">
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <p>
+  {{ form.duration(placeholder="Duration in minutes") }}
+    <span class="error">
+      {% if form.duration.errors %}
+        {% for error in form.duration.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <button type="submit">Submit</button>
+</form>
+{% endblock %}

@@ -64,6 +64,11 @@ class FavouriteChannelsListItem(db.Model):
     user_id = db.Column(Integer, db.ForeignKey('user.id'), index=True, nullable=False)
     channel = db.relationship('TVChannel')
 
+    def __init__(self, channel_id, user_id):
+        self.channel_id = channel_id
+        self.user_id = user_id
+
+
 
 class FavouriteShowsListItem(db.Model):
     __tablename__ = 'favourite_shows_list_item'
@@ -73,6 +78,10 @@ class FavouriteShowsListItem(db.Model):
     show_id = db.Column(Integer, db.ForeignKey('tvshow.id'), index=True, nullable=False)
     user_id = db.Column(Integer, db.ForeignKey('user.id'), index=True, nullable=False)
     show = db.relationship('TVShow')
+
+    def __init__(self, show_id, user_id):
+        self.show_id = show_id
+        self.user_id = user_id
 
 
 # ################################### #
@@ -102,6 +111,9 @@ class TVChannel(db.Model):
 
     timetable = db.relationship('TVChannelItem', backref='channel')
 
+    def __init__(self, name):
+        self.name = name
+
 
 class TVChannelItem(db.Model):
     __tablename__ = 'tvchannel_item'
@@ -111,6 +123,11 @@ class TVChannelItem(db.Model):
 
     show_id = db.Column(Integer, db.ForeignKey('tvshow.id'), index=True, nullable=False)
     channel_id = db.Column(Integer, db.ForeignKey('tvchannel.id'), index=True, nullable=False)
+
+    def __init__(self, start_time, show_id, channel_id):
+        self.start_time = start_time
+        self.show_id = show_id
+        self.channel_id = channel_id
 
 
 class ChannelsListItem(db.Model):
@@ -123,6 +140,10 @@ class ChannelsListItem(db.Model):
 
     channel = db.relationship('TVChannel')
 
+    def __init__(self, channels_list_id, channel_id):
+        self.channels_list_id = channels_list_id
+        self.channel_id = channel_id
+
 
 class ChannelsList(db.Model):
     __tablename__ = 'channels_list'
@@ -131,3 +152,6 @@ class ChannelsList(db.Model):
     name = db.Column(String(80), unique=True, index=True, nullable=False)
 
     channels = db.relationship('ChannelsListItem', backref='channels_list')
+
+    def __init__(self, name):
+        self.name = name

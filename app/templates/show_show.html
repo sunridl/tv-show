@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div>
+    {% if show %}
+        <h2>
+          {{ show.name }}
+          {% if current_user.is_admin() %}
+            <a class="edit-link" href="{{ url_for('show_edit', show_id=show.id) }}">[edit]</a>
+          {% endif %}
+        </h2>
+        <p>Duration: {{ show.duration }} min</p>
+        <hr/>
+        {% if show.timetable and show.timetable | length > 0 %}
+          <ul class="list-group">
+            {% for list_item in show.timetable %}
+              On {{ list_item.channel.name }} at {{ list_item.start_time }}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <h3 class="text-center">TV-Show is not on the air</h3>
+        {% endif %}
+    {% else %}
+      <h3 class="text-center">No such show</h3>
+    {% endif %}
+  </div>
+{% endblock %}

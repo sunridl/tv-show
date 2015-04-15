@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div>
+    {% if channel %}
+        <h2>
+          {{ channel.name }}
+          {% if current_user.is_admin() %}
+            <a class="edit-link" href="{{ url_for('channel_edit', channel_id=channel.id) }}">[edit]</a>
+          {% endif %}
+        </h2>
+        <hr/>
+        {% if channel.timetable and channel.timetable | length > 0 %}
+          <ul class="list-group">
+            {% for list_item in channel.timetable %}
+              {{ list_item.show.name }} is for {{ list_item.show.duration }} at {{ list_item.start_time }}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <h3 class="text-center">Channel has no shows</h3>
+        {% endif %}
+    {% else %}
+      <h3 class="text-center">No such channel</h3>
+    {% endif %}
+  </div>
+{% endblock %}

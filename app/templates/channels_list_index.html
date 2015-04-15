@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if lists and lists | length > 0 %}
+    {% for channels_list in lists %}
+      <div>
+        <h3>
+          <a href="{{ url_for('channels_list_show', channels_list_id=channels_list.id) }}">{{ channels_list.name }}</a>
+          {% if current_user.is_admin() %}
+            <a class="edit-link" href="{{ url_for('channels_list_edit', channels_list_id=channels_list.id) }}">[edit]</a>
+          {% endif %}
+        </h3>
+        <p>
+          Channels:
+            {% for item in channels_list.channels %}
+              <a href="{{ url_for('channel_show', channel_id=item.channel.id) }}">{{ item.channel.name }}</a>;
+            {% endfor %}
+        </p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h3 class="text-center">Nothing to show</h3>
+  {% endif %}
+{% endblock %}
