@@ -4,11 +4,17 @@ import datetime
 from app import db, lm
 from flask import url_for, render_template, request, current_app
 from flask.ext.login import logout_user, login_user, current_user, login_required
-from forms import LoginForm, RegisterForm, TVChannelForm, TVShowForm, ChannelsListForm
+from forms import LoginForm, RegisterForm, TVChannelForm, TVShowForm, ChannelsListForm, FavouriteShowsForm, \
+    FavouriteChannelsForm
 from werkzeug.utils import redirect
 
 from app.models import User, FavouriteChannelsListItem, FavouriteShowsListItem
 from app.models import TVShow, TVChannel, TVChannelItem, ChannelsList, ChannelsListItem
+
+
+class Struct:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
 
 
 def admin_required(func):
@@ -93,8 +99,50 @@ def user_show(user_id):
 
     return render_template('user_show.html', title=title, user=user)
 
+
 # ################################# #
-# ########## Lists VIEWS ########## #
+# ####### Favourites VIEWS ######## #
+# ################################# #
+
+
+@login_required
+def favourite_channels_edit(user_id):
+    user = User.query.get(user_id)
+    if current_user.id != user.id:
+        return lm.unauthorized()
+
+    form = FavouriteChannelsForm(obj=Struct(**{'channels': user.favourite_channels})) if user is not None else FavouriteChannelsForm(request.form)
+
+    if form.validate_on_submit():
+        favourite_channels = [FavouriteChannelsListItem(c.id, user.id) for c in form.channels.data]
+        user.favourite_channels = favourite_channels
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('user_show', user_id=user.id))
+
+    return render_template('favourite_channels_edit.html', form=form, user=user)
+
+
+@login_required
+def favourite_shows_edit(user_id):
+    user = ChannelsList.query.get(user_id)
+    if current_user.id != user.id:
+        return lm.unauthorized()
+
+    form = FavouriteShowsForm(obj=Struct(**{'shows': user.favourite_shows})) if user is not None else FavouriteShowsForm(request.form)
+
+    if form.validate_on_submit():
+        favourite_shows = [FavouriteShowsListItem(s.id, user.id) for s in form.shows.data]
+        user.favourite_shows = favourite_shows
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('user_show', user_id=user.id))
+
+    return render_template('favourite_shows_edit.html', form=form, user=user)
+
+
+# ################################# #
+# ###### ChannelsList VIEWS ####### #
 # ################################# #
 
 

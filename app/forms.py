@@ -1,4 +1,4 @@
-from app.models import TVChannel
+from app.models import TVChannel, TVShow
 from flask.ext.wtf import Form
 from wtforms import BooleanField, StringField, PasswordField, IntegerField, widgets
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -30,6 +30,24 @@ class ChannelsListForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=80)])
     channels = QuerySelectMultipleField(
         query_factory=TVChannel.query.all,
+        get_label=lambda x: x.name,
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
+
+
+class FavouriteChannelsForm(Form):
+    channels = QuerySelectMultipleField(
+        query_factory=TVChannel.query.all,
+        get_label=lambda x: x.name,
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
+
+
+class FavouriteShowsForm(Form):
+    shows = QuerySelectMultipleField(
+        query_factory=TVShow.query.all,
         get_label=lambda x: x.name,
         widget=widgets.ListWidget(prefix_label=False),
         option_widget=widgets.CheckboxInput()

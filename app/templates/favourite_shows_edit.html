@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if user %}
+    <h1>{{ user.nickname }}'s Favourite TV-shows</h1>
+    <br>
+    <form method="post" name="favouriteshows" action="">
+      {{ form.csrf_token }}
+      <p>
+        {{ form.shows(class_="list-unstyled") }}
+        <span class="error">
+          {% if form.shows.errors %}
+            {% for error in form.shows.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button type="submit">Submit</button>
+    </form>
+  {% else %}
+    <h3 class="text-center">No such user</h3>
+  {% endif %}
+{% endblock %}

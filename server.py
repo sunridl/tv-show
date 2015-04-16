@@ -6,6 +6,8 @@ app.add_url_rule('/users/register', view_func=views.user_register, methods=['GET
 app.add_url_rule('/users/login', view_func=views.user_login, methods=['GET', 'POST'])
 app.add_url_rule('/users/logout', view_func=views.user_logout, methods=['GET', 'POST'])
 app.add_url_rule('/users/<int:user_id>', view_func=views.user_show, methods=['GET', 'POST'])
+app.add_url_rule('/users/<int:user_id>/favourites/shows/edit', view_func=views.favourite_shows_edit, methods=['GET', 'POST'])
+app.add_url_rule('/users/<int:user_id>/favourites/channels/edit', view_func=views.favourite_channels_edit, methods=['GET', 'POST'])
 
 app.add_url_rule('/channels_list/', view_func=views.channels_list_index, methods=['GET', 'POST'])
 app.add_url_rule('/channels_list/create', view_func=views.channels_list_create, methods=['GET', 'POST'])

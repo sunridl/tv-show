@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if user %}
+    <h1>{{ user.nickname }}'s Favourite TV-channels</h1>
+    <br>
+    <form method="post" name="favouritechannels" action="">
+      {{ form.csrf_token }}
+      <p>
+        {{ form.channels(class_="list-unstyled") }}
+        <span class="error">
+          {% if form.channels.errors %}
+            {% for error in form.channels.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button type="submit">Submit</button>
+    </form>
+  {% else %}
+    <h3 class="text-center">No such user</h3>
+  {% endif %}
+{% endblock %}

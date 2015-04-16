@@ -69,7 +69,6 @@ class FavouriteChannelsListItem(db.Model):
         self.user_id = user_id
 
 
-
 class FavouriteShowsListItem(db.Model):
     __tablename__ = 'favourite_shows_list_item'
 
