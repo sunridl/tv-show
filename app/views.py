@@ -5,7 +5,7 @@ from app import db, lm
 from flask import url_for, render_template, request, current_app
 from flask.ext.login import logout_user, login_user, current_user, login_required
 from forms import LoginForm, RegisterForm, TVChannelForm, TVShowForm, ChannelsListForm, FavouriteShowsForm, \
-    FavouriteChannelsForm
+    FavouriteChannelsForm, TVChannelItemForm
 from werkzeug.utils import redirect
 
 from app.models import User, FavouriteChannelsListItem, FavouriteShowsListItem
@@ -228,6 +228,41 @@ def channel_edit(channel_id):
         return redirect(url_for('channel_show', channel_id=channel.id))
 
     return render_template('channel_edit.html', form=form)
+
+
+# ######################################## #
+# ########## ChannelItem VIEWS ########### #
+# ######################################## #
+
+
+@login_required
+@admin_required
+def channel_item_create(channel_id):
+    channel = TVChannel.query.get(channel_id)
+    form = TVChannelItemForm(request.form)
+
+    if form.validate_on_submit():
+        channel.timetable.append(TVChannelItem(form.start_time.data, form.show.data, channel.id))
+        db.session.add(channel)
+        db.session.commit()
+        return redirect(url_for('channel_show', channels_id=channel.id))
+
+    return render_template('channel_item_edit.html', form=form)
+
+
+
+@login_required
+@admin_required
+def channels_list_edit(channels_list_id):
+    channels_list = ChannelsList.query.get(channels_list_id)
+    form = ChannelsListForm(obj=channels_list)
+
+    if form.validate_on_submit():
+        db.session.add(channels_list)
+        db.session.commit()
+        return redirect(url_for('channels_list_show', channels_list_id=channels_list.id))
+
+    return render_template('channels_list_edit.html', form=form)
 
 
 # ################################# #

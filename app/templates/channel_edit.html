@@ -15,6 +15,28 @@
       {% endif %}
     </span>
   </p>
+  <br/>
+  <p>
+    Fill channel's timetable: <a id="timetable-adder" href="#">Add new item to timetable...</a>
+  </p>
+  <p>
+    <ul id="timetable" class="list-unstyled">
+    {% for item in form.shows %}
+      <li class="timetable-item">
+      {% for field in item %}
+        {{ field() }}
+      {% endfor %}
+      </li>
+    {% endfor %}
+    </ul>
+    <span class="error">
+      {% if form.shows.errors %}
+        {% for error in form.shows.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
   <button type="submit">Submit</button>
 </form>
 {% endblock %}

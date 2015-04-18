@@ -19,6 +19,11 @@ app.add_url_rule('/channels/create', view_func=views.channel_create, methods=['G
 app.add_url_rule('/channels/<int:channel_id>', view_func=views.channel_show, methods=['GET', 'POST'])
 app.add_url_rule('/channels/<int:channel_id>/edit', view_func=views.channel_edit, methods=['GET', 'POST'])
 
+app.add_url_rule('/channels/<int:channel_id>/timetable/add', view_func=views.channel_item_create, methods=['GET', 'POST'])
+app.add_url_rule('/channels/<int:channel_id>/timetable/<int:item_id>/edit', view_func=views.channel_item_edit, methods=['GET', 'POST'])
+app.add_url_rule('/channels/<int:channel_id>/timetable/<int:item_id>/delete', view_func=views.channel_item_delete, methods=['GET', 'POST'])
+
+
 app.add_url_rule('/shows/', view_func=views.show_index, methods=['GET', 'POST'])
 app.add_url_rule('/shows/create', view_func=views.show_create, methods=['GET', 'POST'])
 app.add_url_rule('/shows/<int:show_id>', view_func=views.show_show, methods=['GET', 'POST'])

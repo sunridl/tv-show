@@ -1,7 +1,11 @@
+from datetime import datetime
 from app.models import TVChannel, TVShow
 from flask.ext.wtf import Form
-from wtforms import BooleanField, StringField, PasswordField, IntegerField, widgets
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms import BooleanField, StringField, PasswordField, IntegerField, widgets, FieldList, \
+    FormField
+import wtforms
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
+from wtforms.fields.html5 import DateTimeField
 from wtforms.validators import DataRequired, Length, Email, NumberRange
 
 
@@ -17,8 +21,22 @@ class RegisterForm(Form):
     password = PasswordField('password', validators=[DataRequired(), Length(min=6, max=25)])
 
 
+# wtforms.Form is NOT flask.ext.wtf.Form, which is actually sublacc of wtforms.SecureForm!
+class TVChannelItemForm(wtforms.Form):
+    start_time = DateTimeField(
+        'start_time',
+        format='%d.%m.%Y %H:%M',
+        validators=[DataRequired()],
+        default=datetime.now())
+    show = QuerySelectField(
+        query_factory=TVShow.query.all,
+        get_label=lambda x: x.name
+    )
+
+
 class TVChannelForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=80)])
+    shows = FieldList(FormField(TVChannelItemForm), min_entries=1)
 
 
 class TVShowForm(Form):
