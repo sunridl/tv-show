@@ -19,4 +19,18 @@
 
 ## Разворачивание
 1. git clone git@github.com:sunridl/tv-show.git
-2. Перейти в созданную директорию и открыть index.html (cd tv-show && open index.html)
+2. Установить Python и связанные утилиты:
+  1. sudo apt-get install python-setuptools python-dev build-essential
+  2. sudo easy_install pip
+  3. sudo pip install virtualenv
+3. Перейти в директорию проекта (cd tv-show)
+4. Создать виртуальное окружение: virtualenv env
+5. Активировать виртуальное окружение: . env/bin/activate
+6. Разрешить python-зависимости: pip install requirements.txt
+7. Подготовить БД
+  1. Запустить python shell.py
+  2. Командой db.create_all() создать БД
+  3. Командой db_create_admin() создать пользователя-администратора
+8. Запустить сервер: python server.py
+9. Перейти в браузере по адресу http://localhost:5000/
+10. Администратор -- (Admin, 123456). Обычный пользователь -- (kitten, 123456).

@@ -1,30 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Timetable editor for {{ channel.name }}</h1>
-<br>
-<form method="post" name="register" action="">
-  {{ form.csrf_token }}
-  <p>
-    {{ form.show() }}
-    <span class="error">
-      {% if form.name.errors %}
-        {% for error in form.name.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <p>
-    {{ form.start_time() }}
-    <span class="error">
-      {% if form.name.errors %}
-        {% for error in form.name.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <button type="submit">Submit</button>
-</form>
+  {% if channel %}
+    <h1>Timetable editor for {{ channel.name }}</h1>
+    <br>
+    <form method="post" name="register" action="">
+      {{ form.csrf_token }}
+      <p>
+        {{ form.show() }}
+        <span class="error">
+          {% if form.show.errors %}
+            {% for error in form.show.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <p>
+        {{ form.start_time() }}
+        <span class="error">
+          {% if form.start_time.errors %}
+            {% for error in form.start_time.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button type="submit">Submit</button>
+    </form>
+  {% else %}
+    <h3 class="text-center">No such channel</h3>
+  {% endif %}
 {% endblock %}

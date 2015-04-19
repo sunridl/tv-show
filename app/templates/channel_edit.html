@@ -3,7 +3,7 @@
 {% block content %}
 <h1>TV-channel editor</h1>
 <br>
-<form method="post" name="register" action="">
+<form method="post" name="channeledit" action="">
   {{ form.csrf_token }}
   <p>
     {{ form.name(placeholder="TV-Channel name") }}
@@ -16,27 +16,6 @@
     </span>
   </p>
   <br/>
-  <p>
-    Fill channel's timetable: <a id="timetable-adder" href="#">Add new item to timetable...</a>
-  </p>
-  <p>
-    <ul id="timetable" class="list-unstyled">
-    {% for item in form.shows %}
-      <li class="timetable-item">
-      {% for field in item %}
-        {{ field() }}
-      {% endfor %}
-      </li>
-    {% endfor %}
-    </ul>
-    <span class="error">
-      {% if form.shows.errors %}
-        {% for error in form.shows.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
   <button type="submit">Submit</button>
 </form>
 {% endblock %}

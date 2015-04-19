@@ -8,12 +8,16 @@
           <a href="{{ url_for('channel_show', channel_id=channel.id) }}">{{ channel.name }}</a>
           {% if current_user.is_admin() %}
             <a class="edit-link" href="{{ url_for('channel_edit', channel_id=channel.id) }}">[edit]</a>
+            <a class="edit-link" href="{{ url_for('channel_delete', channel_id=channel.id) }}">[delete]</a>
           {% endif %}
         </h3>
-        <p>Broadcasts {{ channel.timetable | length }} TV-Shows</p>
+        <p>Broadcasts {{ channel.timetable_length() }} TV-Shows</p>
       </div>
     {% endfor %}
   {% else %}
     <h3 class="text-center">Nothing to show</h3>
+  {% endif %}
+  {% if current_user.is_admin() %}
+    <a href="{{ url_for('channel_create') }}">Create new channel...</a>
   {% endif %}
 {% endblock %}

@@ -9,23 +9,27 @@
           Email: <a href="{{ user.email | e }}">{{ user.email | e }}</a>
         </p>
         <hr/>
-        <p>Favourite channels: </p>
+        <p>Favourite channels:
+          <a href="{{ url_for('favourite_channels_edit', user_id=current_user.id) }}">[edit]</a></p>
         <ul class="list-group">
           {% if user.favourite_channels and user.favourite_channels | length > 0 %}
               {% for item in user.favourite_channels %}
                 <li>{{ item.channel.name }}</li>
               {% endfor %}
+          {% else %}
+            <li>No favourite channels</li>
           {% endif %}
-          <li><a href="{{ url_for('favourite_channels_edit', user_id=current_user.id) }}">Add channel...</a></li>
         </ul>
-        <p>Favourite TV-Shows: </p>
+        <p>Favourite TV-Shows:
+          <a href="{{ url_for('favourite_shows_edit', user_id=current_user.id) }}">[edit]</a></p></p>
         <ul class="list-group">
           {% if user.favourite_shows and user.favourite_shows | length > 0 %}
               {% for item in user.favourite_shows %}
                 <li>{{ item.show.name }}</li>
               {% endfor %}
+          {% else %}
+            <li>No favourite shows</li>
           {% endif %}
-          <li><a href="{{ url_for('favourite_shows_edit', user_id=current_user.id) }}">Add show...</a></li>
         </ul>
     {% else %}
       <h3 class="text-center">No such user</h3>

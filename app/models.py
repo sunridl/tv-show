@@ -101,6 +101,12 @@ class TVShow(db.Model):
         self.name = name
         self.duration = duration
 
+    def timetable_length(self):
+        ids = {}
+        for item in self.timetable:
+            ids[item.channel_id] = ids.get(item.channel_id, 0) + 1
+        return len(ids.keys())
+
 
 class TVChannel(db.Model):
     __tablename__ = 'tvchannel'
@@ -112,6 +118,12 @@ class TVChannel(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+    def timetable_length(self):
+        ids = {}
+        for item in self.timetable:
+            ids[item.show_id] = ids.get(item.show_id, 0) + 1
+        return len(ids.keys())
 
 
 class TVChannelItem(db.Model):

@@ -7,16 +7,34 @@
           {{ show.name }}
           {% if current_user.is_admin() %}
             <a class="edit-link" href="{{ url_for('show_edit', show_id=show.id) }}">[edit]</a>
+            <a class="edit-link" href="{{ url_for('show_delete', show_id=show.id) }}">[delete]</a>
           {% endif %}
         </h2>
         <p>Duration: {{ show.duration }} min</p>
         <hr/>
         {% if show.timetable and show.timetable | length > 0 %}
-          <ul class="list-group">
-            {% for list_item in show.timetable %}
-              On {{ list_item.channel.name }} at {{ list_item.start_time }}
-            {% endfor %}
-          </ul>
+          <table class="table">
+          <thead>
+            <td>Channel</td>
+            <td>Start time</td>
+            <td>Duration</td>
+          </thead>
+          <tbody>
+          {% for item in show.timetable %}
+            <tr>
+              <td>
+                <a href="{{ url_for('channel_show', channel_id=item.channel.id) }}">{{ item.channel.name }}</a>
+              </td>
+              <td>
+                {{ item.start_time | datetime('%d.%m.%Y %H:%M') }}
+              </td>
+              <td>
+                {{ item.show.duration | timedelta('%H h %M min') }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        </table>
         {% else %}
           <h3 class="text-center">TV-Show is not on the air</h3>
         {% endif %}

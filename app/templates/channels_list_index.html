@@ -8,6 +8,7 @@
           <a href="{{ url_for('channels_list_show', channels_list_id=channels_list.id) }}">{{ channels_list.name }}</a>
           {% if current_user.is_admin() %}
             <a class="edit-link" href="{{ url_for('channels_list_edit', channels_list_id=channels_list.id) }}">[edit]</a>
+            <a class="edit-link" href="{{ url_for('channels_list_delete', channels_list_id=channels_list.id) }}">[delete]</a>
           {% endif %}
         </h3>
         <p>
@@ -20,5 +21,8 @@
     {% endfor %}
   {% else %}
     <h3 class="text-center">Nothing to show</h3>
+  {% endif %}
+  {% if current_user.is_admin() %}
+    <a href="{{ url_for('channels_list_create') }}">Create new channels' list...</a>
   {% endif %}
 {% endblock %}

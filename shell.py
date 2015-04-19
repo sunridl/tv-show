@@ -15,6 +15,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from app import *
 
 from app.models import *
+from app import views
+from app.forms import *
 
 
 def create_admin():

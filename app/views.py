@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import datetime
+from datetime import datetime as dt
 from app import db, lm
 from flask import url_for, render_template, request, current_app
 from flask.ext.login import logout_user, login_user, current_user, login_required
 from forms import LoginForm, RegisterForm, TVChannelForm, TVShowForm, ChannelsListForm, FavouriteShowsForm, \
-    FavouriteChannelsForm, TVChannelItemForm
+    FavouriteChannelsForm, TVChannelItemForm, SearchForm
 from werkzeug.utils import redirect
 
 from app.models import User, FavouriteChannelsListItem, FavouriteShowsListItem
@@ -34,7 +35,26 @@ def admin_required(func):
 
 @login_required
 def global_index():
-    return "Hello!"
+    form = SearchForm(request.form)
+    timetable = TVChannelItem.query
+
+    if form.validate_on_submit():
+        if form.channel_name.data:
+            channels = TVChannel.query.filter(TVChannel.name.contains(form.channel_name.data)).all()
+            timetable = timetable.filter(TVChannelItem.channel_id.in_(c.id for c in channels))
+
+        if form.show_name.data:
+            shows = TVShow.query.filter(TVShow.name.contains(form.show_name.data)).all()
+            timetable = timetable.filter(TVChannelItem.show_id.in_(s.id for s in shows))
+
+        if form.time_from.data and form.time_to.data:
+            f = form.time_from.data
+            t = form.time_to.data
+            timetable = timetable.filter(TVChannelItem.start_time.between(f, t))
+
+    timetable = timetable.order_by(TVChannelItem.start_time).all()
+
+    return render_template('global_index.html', timetable=timetable, form=form)
 
 
 # ################################# #
@@ -100,6 +120,18 @@ def user_show(user_id):
     return render_template('user_show.html', title=title, user=user)
 
 
+@login_required
+def user_delete(user_id):
+    user = User.query.get(user_id)
+    for c in user.favourite_channels:
+        c.query.delete()
+    for s in user.favourite_shows:
+        s.query.delete()
+    user.query.delete()
+    db.session.commit()
+    return redirect(url_for('global_index'))
+
+
 # ################################# #
 # ####### Favourites VIEWS ######## #
 # ################################# #
@@ -111,7 +143,8 @@ def favourite_channels_edit(user_id):
     if current_user.id != user.id:
         return lm.unauthorized()
 
-    form = FavouriteChannelsForm(obj=Struct(**{'channels': user.favourite_channels})) if user is not None else FavouriteChannelsForm(request.form)
+    form = FavouriteChannelsForm(formdata=request.form,
+                                 obj=Struct(**{'channels': user.favourite_channels})) if user is not None else FavouriteChannelsForm(request.form)
 
     if form.validate_on_submit():
         favourite_channels = [FavouriteChannelsListItem(c.id, user.id) for c in form.channels.data]
@@ -125,11 +158,12 @@ def favourite_channels_edit(user_id):
 
 @login_required
 def favourite_shows_edit(user_id):
-    user = ChannelsList.query.get(user_id)
+    user = User.query.get(user_id)
     if current_user.id != user.id:
         return lm.unauthorized()
 
-    form = FavouriteShowsForm(obj=Struct(**{'shows': user.favourite_shows})) if user is not None else FavouriteShowsForm(request.form)
+    form = FavouriteShowsForm(formdata=request.form,
+                              obj=Struct(**{'shows': user.favourite_shows})) if user is not None else FavouriteShowsForm(request.form)
 
     if form.validate_on_submit():
         favourite_shows = [FavouriteShowsListItem(s.id, user.id) for s in form.shows.data]
@@ -176,7 +210,7 @@ def channels_list_create():
 @admin_required
 def channels_list_edit(channels_list_id):
     channels_list = ChannelsList.query.get(channels_list_id)
-    form = ChannelsListForm(obj=channels_list)
+    form = ChannelsListForm(formdata=request.form, obj=channels_list)
 
     if form.validate_on_submit():
         db.session.add(channels_list)
@@ -184,6 +218,17 @@ def channels_list_edit(channels_list_id):
         return redirect(url_for('channels_list_show', channels_list_id=channels_list.id))
 
     return render_template('channels_list_edit.html', form=form)
+
+
+@login_required
+@admin_required
+def channels_list_delete(channels_list_id):
+    channels_list = ChannelsList.query.get(channels_list_id)
+    for c in channels_list.channels:
+        c.query.delete()
+    channels_list.query.delete()
+    db.session.commit()
+    return redirect(url_for('channel_index'))
 
 
 # ################################# #
@@ -220,7 +265,7 @@ def channel_create():
 @admin_required
 def channel_edit(channel_id):
     channel = TVChannel.query.get(channel_id)
-    form = TVChannelForm(obj=channel)
+    form = TVChannelForm(formdata=request.form, obj=channel)
 
     if form.validate_on_submit():
         db.session.add(channel)
@@ -228,6 +273,23 @@ def channel_edit(channel_id):
         return redirect(url_for('channel_show', channel_id=channel.id))
 
     return render_template('channel_edit.html', form=form)
+
+
+@login_required
+@admin_required
+def channel_delete(channel_id):
+    channel = TVChannel.query.get(channel_id)
+
+    item_ids = [item.id for item in channel.timetable]
+    TVChannelItem.query.filter(TVChannelItem.channel_id.in_(item_ids)).delete()
+
+    FavouriteChannelsListItem.query.filter_by(channel_id=channel.id).delete()
+    ChannelsListItem.query.filter_by(channel_id=channel.id).delete()
+
+    TVChannel.query.filter_by(id=channel_id).delete()
+    db.session.commit()
+
+    return redirect(url_for('channel_index'))
 
 
 # ######################################## #
@@ -242,27 +304,38 @@ def channel_item_create(channel_id):
     form = TVChannelItemForm(request.form)
 
     if form.validate_on_submit():
-        channel.timetable.append(TVChannelItem(form.start_time.data, form.show.data, channel.id))
+        start_time = form.start_time.data
+        channel.timetable.append(TVChannelItem(start_time, form.show.data.id, channel.id))
         db.session.add(channel)
         db.session.commit()
-        return redirect(url_for('channel_show', channels_id=channel.id))
+        return redirect(url_for('channel_show', channel_id=channel.id))
 
-    return render_template('channel_item_edit.html', form=form)
-
+    return render_template('channel_item_edit.html', form=form, channel=channel)
 
 
 @login_required
 @admin_required
-def channels_list_edit(channels_list_id):
-    channels_list = ChannelsList.query.get(channels_list_id)
-    form = ChannelsListForm(obj=channels_list)
+def channel_item_edit(channel_id, item_id):
+    channel_item = TVChannelItem.get(item_id)
+    form = TVChannelItemForm(formdata=request.form, obj=channel_item)
 
     if form.validate_on_submit():
-        db.session.add(channels_list)
+        channel_item.start_time = dt.strptime(form.start_time.data, '%d.%m.%Y %H:%M')
+        channel_item.show = form.show.data.id
+        db.session.add(channel_item)
         db.session.commit()
-        return redirect(url_for('channels_list_show', channels_list_id=channels_list.id))
+        return redirect(url_for('channel_show', channel_id=channel_id))
 
-    return render_template('channels_list_edit.html', form=form)
+    channel = channel_item.channel if channel_item is not None else None
+    return render_template('channel_item_edit.html', form=form, channel=channel)
+
+
+@login_required
+@admin_required
+def channel_item_delete(channel_id, item_id):
+    TVChannelItem.filter_by(id=item_id).delete()
+    db.session.commit()
+    return redirect(url_for('channel_show', channel_id=channel_id))
 
 
 # ################################# #
@@ -309,3 +382,18 @@ def show_edit(show_id):
 
     return render_template('show_edit.html', form=form)
 
+
+@login_required
+@admin_required
+def show_delete(show_id):
+    show = TVShow.query.get(show_id)
+
+    for item in show.timetable:
+        TVChannelItem.query.filter_by(show_id=item.id).delete()
+
+    FavouriteShowsListItem.query.filter_by(show_id=show.id).delete()
+
+    TVShow.query.filter_by(id=show.id).delete()
+    db.session.commit()
+
+    return redirect(url_for('channel_index'))

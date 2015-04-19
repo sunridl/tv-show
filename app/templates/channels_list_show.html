@@ -7,6 +7,7 @@
           {{ channels_list.name }}
           {% if current_user.is_admin() %}
             <a class="edit-link" href="{{ url_for('channels_list_edit', channels_list_id=channels_list.id) }}">[edit]</a>
+            <a class="edit-link" href="{{ url_for('channels_list_delete', channels_list_id=channels_list.id) }}">[edit]</a>
           {% endif %}
         </h2>
         <hr/>

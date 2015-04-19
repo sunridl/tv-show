@@ -7,15 +7,34 @@
           {{ channel.name }}
           {% if current_user.is_admin() %}
             <a class="edit-link" href="{{ url_for('channel_edit', channel_id=channel.id) }}">[edit]</a>
+            <a class="edit-link" href="{{ url_for('channel_delete', channel_id=channel.id) }}">[delete]</a>
+            <a class="edit-link" href="{{ url_for('channel_item_create', channel_id=channel.id) }}">[add item to timetable]</a>
           {% endif %}
         </h2>
         <hr/>
         {% if channel.timetable and channel.timetable | length > 0 %}
-          <ul class="list-group">
-            {% for list_item in channel.timetable %}
-              {{ list_item.show.name }} is for {{ list_item.show.duration }} at {{ list_item.start_time }}
-            {% endfor %}
-          </ul>
+          <table class="table">
+          <thead>
+            <td>TV-Show</td>
+            <td>Start time</td>
+            <td>Duration</td>
+          </thead>
+          <tbody>
+          {% for item in channel.timetable %}
+            <tr>
+              <td>
+                <a href="{{ url_for('show_show', show_id=item.show.id) }}">{{ item.show.name }}</a>
+              </td>
+              <td>
+                {{ item.start_time | datetime('%d.%m.%Y %H:%M') }}
+              </td>
+              <td>
+                {{ item.show.duration | timedelta('%H h %M min') }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        </table>
         {% else %}
           <h3 class="text-center">Channel has no shows</h3>
         {% endif %}
