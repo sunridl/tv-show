@@ -9,7 +9,7 @@
           Email: <a href="{{ user.email | e }}">{{ user.email | e }}</a>
         </p>
         <hr/>
-        <p>Favourite channels:
+        <p><b>Favourite channels:</b>
           <a href="{{ url_for('favourite_channels_edit', user_id=current_user.id) }}">[edit]</a></p>
         <ul class="list-group">
           {% if user.favourite_channels and user.favourite_channels | length > 0 %}
@@ -20,7 +20,7 @@
             <li>No favourite channels</li>
           {% endif %}
         </ul>
-        <p>Favourite TV-Shows:
+        <p><b>Favourite TV-Shows:</b>
           <a href="{{ url_for('favourite_shows_edit', user_id=current_user.id) }}">[edit]</a></p></p>
         <ul class="list-group">
           {% if user.favourite_shows and user.favourite_shows | length > 0 %}

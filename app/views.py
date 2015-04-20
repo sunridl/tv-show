@@ -114,7 +114,7 @@ def user_show(user_id):
     user = User.query.get(user_id)
     title = u'No such user' if user is None else user.nickname
 
-    if current_user.id != user.id and not current_user.is_admin():
+    if user is not None and current_user.id != user.id and not current_user.is_admin():
         return lm.unauthorized()
 
     return render_template('user_show.html', title=title, user=user)
@@ -268,6 +268,7 @@ def channel_edit(channel_id):
     form = TVChannelForm(formdata=request.form, obj=channel)
 
     if form.validate_on_submit():
+        channel.name = form.name.data
         db.session.add(channel)
         db.session.commit()
         return redirect(url_for('channel_show', channel_id=channel.id))
@@ -376,6 +377,7 @@ def show_edit(show_id):
     form = TVShowForm(obj=show)
 
     if form.validate_on_submit():
+        show.name = form.name.data
         db.session.add(show)
         db.session.commit()
         return redirect(url_for('show_show', show_id=show.id))
