@@ -26,7 +26,7 @@
 3. Перейти в директорию проекта (cd tv-show)
 4. Создать виртуальное окружение: virtualenv env
 5. Активировать виртуальное окружение: . env/bin/activate
-6. Разрешить python-зависимости: pip install requirements.txt
+6. Разрешить python-зависимости: pip install -r requirements.txt
 7. Подготовить БД (ТОЛЬКО если файл app.db не существует или устарел!)
   1. Запустить python shell.py
   2. Командой db.create_all() создать БД
